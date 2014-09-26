@@ -1,0 +1,28 @@
+{
+  "name": "buster-ci",
+  "version": "0.1.0",
+  "description": "TODO",
+  "bugs": {
+    "url": "https://github.com/busterjs/buster/issues"
+  },
+  "license": {
+    "type": "MIT",
+    "url": "https://github.com/busterjs/buster-ci/blob/master/LICENSE"
+   },
+  "author": {
+    "name": "Daniel Wittner",
+    "email": "Daniel.Wittner@ppi.de"
+  },
+  "main": "lib/buster-ci.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/busterjs/buster-ci.git"
+  },
+  "scripts": {
+    "test": "buster-test"
+  },
+  "dependencies": {
+  },
+  "devDependencies": {
+  }
+}
