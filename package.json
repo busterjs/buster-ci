@@ -22,7 +22,12 @@
     "test": "buster-test"
   },
   "dependencies": {
+  	"async": "*",
+    "buster-ci-agent": "~0.1",
+    "formatio": "*"
   },
   "devDependencies": {
+    "buster": "*",
+    "proxyquire": "*"
   }
 }
