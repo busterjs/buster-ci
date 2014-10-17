@@ -18,4 +18,4 @@ To use this module you have to install **Buster.JS**
 ## Usage
 
 Have a look at the **Buster.JS** [ documentation](http://docs.busterjs.org/en/latest/modules/buster-ci/),
-to see how it is used.
+to see how **buster-ci** is used.
