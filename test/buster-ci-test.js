@@ -249,7 +249,7 @@ buster.testCase("buster-ci", {
             
             assert.calledOnce(th.server.run);
             assert.calledWith(th.server.run, match(function (array) {
-                return array.indexOf("-p2222") > 0
+                return array.indexOf("-p2222") >= 0
             }));
         }));
     },
@@ -516,14 +516,14 @@ buster.testCase("buster-ci", {
 
     "writes reporter output to file if configured": function (done) {
         
-        this.config["output_file"] = "path/to/xml/output/file";
+        this.config["outputFile"] = "path/to/xml/output/file";
         var fileOutputStream = {};
         th.fs.createWriteStream.returns(fileOutputStream);
         
         new BusterCi(this.config).run(done(function () {
             assert.called(th.fs.createWriteStream);
             assert.calledWith(th.fs.createWriteStream,
-                this.config["output_file"]);
+                this.config["outputFile"]);
             assert.calledWith(th.testCli.create, fileOutputStream);
         }.bind(this)));
     },
