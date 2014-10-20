@@ -9,7 +9,7 @@ var buster = require("buster"),
     busterTestCli = {},
     faye = {},
     fs = {},
-    BusterCi = proxyquire("buster-ci", {
+    BusterCi = proxyquire("../lib/buster-ci", {
         "buster-server-cli": busterServer,
         "buster-ci-agent": AgentStub,
         "buster-test-cli": busterTestCli,

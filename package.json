@@ -1,7 +1,7 @@
 {
   "name": "buster-ci",
   "version": "0.1.0",
-  "description": "TODO",
+  "description": "Start Buster.JS server, capture browsers, run tests, close browsers, shutdown server, all at once.",
   "bugs": {
     "url": "https://github.com/busterjs/buster/issues"
   },
@@ -23,6 +23,9 @@
   },
   "dependencies": {
     "buster-ci-agent": "~0.1",
+    "buster-server-cli": "~0.3",
+    "buster-test-cli": "~0.8",
+    "buster-syntax": "~0.4",
     "async": "~0.9",
     "faye": "~1.0",
     "formatio": "~1.1",
