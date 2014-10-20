@@ -25,7 +25,8 @@
     "buster-ci-agent": "~0.1",
     "async": "~0.9",
     "faye": "~1.0",
-    "formatio": "~1.1"
+    "formatio": "~1.1",
+    "stream-logger": "~1.0"
   },
   "devDependencies": {
     "buster": "*",
