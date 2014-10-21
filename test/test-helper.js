@@ -111,6 +111,11 @@ function stubServerFayeClient(url, slaveIds) {
                     stub.slaveDeathMessages.forEach(cb);
                 }
             }
+            if (channel === "/slave_disconnect") {
+                if (stub.slaveDisconnectMessages) {
+                    stub.slaveDisconnectMessages.forEach(cb);
+                }
+            }
         }, 0);
 
         return {

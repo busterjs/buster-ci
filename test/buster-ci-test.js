@@ -533,6 +533,19 @@ buster.testCase("buster-ci", {
             "Not all browsers could be closed!: 3,4");
     },
 
+    "can handle gracefully disconnect": function (done) {
+        this.fayeClientServer.slaveDeathMessages.splice(3, 1);
+        this.fayeClientServer.slaveDisconnectMessages = [4];
+        var testCliExit = th.testCli.exit;
+
+        var busterCi = new BusterCi(this.config);
+        this.stub(busterCi._logger, "error");
+        busterCi.run(done(function () {
+            assert.calledWith(testCliExit, 1);
+            refute.called(busterCi._logger.error);
+        }));
+    },
+
     "writes reporter output to file if configured": function (done) {
         
         this.config["outputFile"] = "path/to/xml/output/file";

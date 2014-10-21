@@ -27,6 +27,7 @@
     "buster-test-cli": "~0.8",
     "buster-syntax": "~0.4",
     "async": "~0.9",
+    "when": "~3.5",
     "faye": "~1.0",
     "formatio": "~1.1",
     "stream-logger": "~1.0"
