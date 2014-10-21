@@ -19,3 +19,10 @@ To use this module you have to install **Buster.JS**
 
 Have a look at the **Buster.JS** [ documentation](http://docs.busterjs.org/en/latest/modules/buster-ci/),
 to see how **buster-ci** is used.
+
+
+## Changelog
+
+**0.1.1** (21.10.2014)
+
+* can now handle gracefully disconnect of slave
