@@ -104,12 +104,9 @@ buster.testCase("buster-ci", {
         );
     },
 
-    "//passes args to server": function () {
-    },
-
     "starts local agent if agent 'localhost' is specified": function (done) {
 
-        new BusterCi(this.config).run(done(function () {
+        new BusterCi(this.config).run([], done(function () {
 
             assert.calledOnce(AgentStub);
             assert.calledWith(AgentStub, {
@@ -128,7 +125,7 @@ buster.testCase("buster-ci", {
             this.fayeClientServer = stubServerFayeClient(
                 "http://localhost:2222/messaging",  [1, 2]);
             
-            new BusterCi(this.config).run(done(function () {
+            new BusterCi(this.config).run([], done(function () {
     
                 refute.called(AgentStub);
             }));
@@ -136,7 +133,7 @@ buster.testCase("buster-ci", {
 
     "creates faye clients for all agents": function (done) {
 
-        new BusterCi(this.config).run(done(function () {
+        new BusterCi(this.config).run([], done(function () {
 
             assert.calledWith(faye.Client, "http://localhost:8888");
             assert.calledWith(faye.Client, "http://remotehost1:8888");
@@ -152,7 +149,7 @@ buster.testCase("buster-ci", {
             
             var busterCi = new BusterCi(this.config);
             this.stub(busterCi._logger, "error");
-            busterCi.run(done(function () {
+            busterCi.run([], done(function () {
             
                 assert.calledWith(busterCi._logger.error,
                     "Agent http://remotehost1:8888 not accessible!");
@@ -167,7 +164,7 @@ buster.testCase("buster-ci", {
         
         var busterCi = new BusterCi(this.config);
         this.stub(busterCi._logger, "error");
-        busterCi.run(done(function () {
+        busterCi.run([], done(function () {
             
             assert(th.agent.close.calledBefore(testCliExit));
         }));
@@ -180,7 +177,7 @@ buster.testCase("buster-ci", {
             "http://localhost:2222/messaging",  [1, 2]);
         this.fayeClientRemotehost1.accessible = false;
 
-        new BusterCi(this.config).run(done(function () {
+        new BusterCi(this.config).run([], done(function () {
 
             refute.called(th.agent.close);
         }));
@@ -192,7 +189,7 @@ buster.testCase("buster-ci", {
             th.agent.listen.restore();
             this.stub(th.agent, "listen");
     
-            new BusterCi(this.config).run(done);
+            new BusterCi(this.config).run([], done);
 
             var listenCallback = th.agent.listen.getCall(0).args[0];
             refute.called(faye.Client);
@@ -207,7 +204,7 @@ buster.testCase("buster-ci", {
             this.fayeClientServer = stubServerFayeClient(
                 "http://localhost:2222/messaging",  [1, 2]);
         
-            new BusterCi(this.config).run(done(function () {
+            new BusterCi(this.config).run([], done(function () {
 
                 assert.calledWith(faye.Client,
                     "http://localhost:2222/messaging");
@@ -216,7 +213,7 @@ buster.testCase("buster-ci", {
 
     "subscribes for messages from the agents": function (done) {
 
-        new BusterCi(this.config).run(done(function () {
+        new BusterCi(this.config).run([], done(function () {
             
             assert.calledOnce(this.fayeClientLocalhost.subscribe);
             assert.calledWith(
@@ -241,7 +238,7 @@ buster.testCase("buster-ci", {
 
     "runs server": function (done) {
 
-        new BusterCi(this.config).run(done(function () {
+        new BusterCi(this.config).run([], done(function () {
             
             assert.calledOnce(th.server.run);
             assert.calledWith(th.server.run, match.array);
@@ -252,7 +249,7 @@ buster.testCase("buster-ci", {
 
         this.config.server.port = 2222;
         
-        new BusterCi(this.config).run(done(function () {
+        new BusterCi(this.config).run([], done(function () {
             
             assert.calledOnce(th.server.run);
             assert.calledWith(th.server.run, match(function (array) {
@@ -263,7 +260,7 @@ buster.testCase("buster-ci", {
 
     "welcomes all agents": function (done) {
 
-        new BusterCi(this.config).run(done(function () {
+        new BusterCi(this.config).run([], done(function () {
             
             assert.calledWith(
                 this.fayeClientLocalhost.publish,
@@ -287,7 +284,7 @@ buster.testCase("buster-ci", {
 
         var busterCi = new BusterCi(this.config);
         this.stub(busterCi._logger, "info");
-        busterCi.run(done(function () {
+        busterCi.run([], done(function () {
             
             assert.calledWith(busterCi._logger.info,
                 "localhost: " +
@@ -308,7 +305,7 @@ buster.testCase("buster-ci", {
         
         var busterCi = new BusterCi(this.config);
         this.stub(busterCi._logger, "error");
-        busterCi.run(done(function () {
+        busterCi.run([], done(function () {
             
             assert.calledWith(busterCi._logger.error,
                 "Browser FF not configured for agent remotehost2!");
@@ -339,7 +336,7 @@ buster.testCase("buster-ci", {
     "sends start command to agents after welcome and server start":
         function (done) {
 
-            new BusterCi(this.config).run(done(function () {
+            new BusterCi(this.config).run([], done(function () {
             
                 assert.calledWith(
                     this.fayeClientLocalhost.publish,
@@ -384,7 +381,7 @@ buster.testCase("buster-ci", {
             delete this.config.server.host;
             delete this.config.server.port;
     
-            new BusterCi(this.config).run(done(function () {
+            new BusterCi(this.config).run([], done(function () {
             
                 assert.calledWith(
                     this.fayeClientLocalhost.publish,
@@ -440,10 +437,10 @@ buster.testCase("buster-ci", {
                 assert.called(th.testCli.run);
             }.bind(this);
         
-        new BusterCi(this.config).run(done);
+        new BusterCi(this.config).run([], done);
     },
     
-    "errors if not all slaves get ready": function () {
+    "errors if not all slaves get ready after 30s": function () {
         this.clock = this.useFakeTimers();
         th.fixSinon();
         this.fayeClientServer.slaveReadyMessages.splice(2, 2);
@@ -453,7 +450,7 @@ buster.testCase("buster-ci", {
         this.stub(busterCi._logger, "error");
         busterCi.run();
         
-        this.clock.tick(9999);
+        this.clock.tick(29999);
         refute.called(testCliExit);
         this.clock.tick(1);
         assert.calledOnce(testCliExit);
@@ -461,13 +458,48 @@ buster.testCase("buster-ci", {
         assert.calledWith(busterCi._logger.error,
             "Not all browsers got ready!: 3,4");
     },
+    
+    "errors if not all slaves get ready after configured timeout": function () {
+        this.clock = this.useFakeTimers();
+        th.fixSinon();
+        this.fayeClientServer.slaveReadyMessages.splice(2, 2);
+        var testCliExit = th.testCli.exit;
+        this.config.captureTimeout = 40;
+        
+        var busterCi = new BusterCi(this.config);
+        this.stub(busterCi._logger, "error");
+        busterCi.run();
+        
+        this.clock.tick(this.config.captureTimeout * 1000 - 1);
+        refute.called(testCliExit);
+        this.clock.tick(1);
+        assert.calledOnce(testCliExit);
+        assert.calledWith(testCliExit, 1);
+        assert.calledWith(busterCi._logger.error,
+            "Not all browsers got ready!: 3,4");
+    },
+    
+    "configures xml reporter for test run": function (done) {
+        var args = ["--config", "buster-config.js"];
+        
+        new BusterCi(this.config).run([], done(function () {
+            assert.calledWith(th.testCli.run, ["--reporter", "xml"]);
+        }));
+    },
 
-    "//passes args to test runner": function () {
+    "passes args to test runner": function (done) {
+        
+        var args = ["--config", "buster-config.js"];
+        
+        new BusterCi(this.config).run(args, done(function () {
+            assert.calledWith(th.testCli.run, ["--reporter", "xml"]
+                .concat(args));
+        }));
     },
 
     "sends stop command to agents after test run": function (done) {
         
-        new BusterCi(this.config).run(done(function (channel, cb) {
+        new BusterCi(this.config).run([], done(function (channel, cb) {
             assert.calledWith(
                 this.fayeClientLocalhost.publish, "/messages", {
                 command: "stop",
@@ -514,7 +546,7 @@ buster.testCase("buster-ci", {
         new BusterCi(this.config).run();
     },
     
-    "errors if not all browsers are closed": function () {
+    "errors if not all browsers are closed after 30s": function () {
         this.clock = this.useFakeTimers();
         th.fixSinon();
         this.fayeClientServer.slaveDeathMessages.splice(2, 2);
@@ -533,6 +565,27 @@ buster.testCase("buster-ci", {
             "Not all browsers could be closed!: 3,4");
     },
 
+    "errors if not all browsers are closed after configured timeout":
+        function () {
+            this.clock = this.useFakeTimers();
+            th.fixSinon();
+            this.fayeClientServer.slaveDeathMessages.splice(2, 2);
+            var testCliExit = th.testCli.exit;
+            this.config.closeTimeout = 40;
+    
+            var busterCi = new BusterCi(this.config);
+            this.stub(busterCi._logger, "error");
+            busterCi.run();
+    
+            this.clock.tick(this.config.closeTimeout * 1000 - 1);
+            refute.called(testCliExit);
+            this.clock.tick(1);
+            assert.calledOnce(testCliExit);
+            assert.calledWith(testCliExit, 1);
+            assert.calledWith(busterCi._logger.error,
+                "Not all browsers could be closed!: 3,4");
+        },
+
     "can handle gracefully disconnect": function (done) {
         this.fayeClientServer.slaveDeathMessages.splice(3, 1);
         this.fayeClientServer.slaveDisconnectMessages = [4];
@@ -540,7 +593,7 @@ buster.testCase("buster-ci", {
 
         var busterCi = new BusterCi(this.config);
         this.stub(busterCi._logger, "error");
-        busterCi.run(done(function () {
+        busterCi.run([], done(function () {
             assert.calledWith(testCliExit, 1);
             refute.called(busterCi._logger.error);
         }));
@@ -552,7 +605,7 @@ buster.testCase("buster-ci", {
         var fileOutputStream = {};
         th.fs.createWriteStream.returns(fileOutputStream);
         
-        new BusterCi(this.config).run(done(function () {
+        new BusterCi(this.config).run([], done(function () {
             assert.called(th.fs.createWriteStream);
             assert.calledWith(th.fs.createWriteStream,
                 this.config["outputFile"]);
@@ -563,7 +616,7 @@ buster.testCase("buster-ci", {
     "writes reporter output to stdout if no output file is configured":
         function (done) {
 
-            new BusterCi(this.config).run(done(function () {
+            new BusterCi(this.config).run([], done(function () {
                 refute.called(th.fs.createWriteStream);
                 assert.calledWith(th.testCli.create, process.stdout);
             }.bind(this)));
