@@ -23,6 +23,11 @@ to see how **buster-ci** is used.
 
 ## Changelog
 
+**0.2.0** (17.12.2014)
+
+* arguments for test run can now be passed (breaking change, new version of buster.js is needed)
+* timeouts for capturing and closing browsers can now be overwritten via config options
+
 **0.1.1** (21.10.2014)
 
 * can now handle gracefully disconnect of slave
