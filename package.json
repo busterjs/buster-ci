@@ -1,6 +1,6 @@
 {
   "name": "buster-ci",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Start Buster.JS server, capture browsers, run tests, close browsers, shutdown server, all at once.",
   "bugs": {
     "url": "https://github.com/busterjs/buster/issues"

@@ -5,7 +5,7 @@
 This module provides a way to easily use **Buster.JS** in the continues integration process.
 With command `buster-ci` the buster server will be started, browsers started and captured, the tests executed
 and finally the browsers closed and the server stopped. Using [buster agents](https://github.com/busterjs/buster-ci-agent)
-even allows starting browsers on remote machines. 
+even allows starting browsers on remote machines.
 
 
 ## Installation
@@ -22,6 +22,10 @@ to see how **buster-ci** is used.
 
 
 ## Changelog
+
+**0.2.1** (30.01.2015)
+
+* Fix for issue [#448 - buster-ci should pass the server url to buster test cli](https://github.com/busterjs/buster/issues/448)
 
 **0.2.0** (17.12.2014)
 
