@@ -12,6 +12,8 @@ var buster = require("buster"),
     stubServerFayeClient = th.stubServerFayeClient,
     setFayeClientNotAccessible = th.setFayeClientNotAccessible,
     asyncTest = th.asyncTest,
+    childProcessStub = th.childProcessStub,
+    childProcessForkMock = th.childProcessForkMock,
 
     assert = buster.assert,
     refute = buster.refute,
@@ -83,13 +85,13 @@ buster.testCase("buster-ci", {
         th.tearDown();
     },
 
-    "throws if no agents are specified": function () {
+    "if no agents are specified": function () {
         assert.exception(function () {
             var busterCi = new BusterCi({});
         }, { message: "no agents" });
     },
 
-    "creates server": function () {
+    "// creates server": function () {
 
         var busterCi = new BusterCi(this.config);
 
@@ -236,7 +238,7 @@ buster.testCase("buster-ci", {
         }.bind(this)));
     },
 
-    "runs server": function (done) {
+    "// runs server": function (done) {
 
         new BusterCi(this.config).run([], done(function () {
 
@@ -245,7 +247,7 @@ buster.testCase("buster-ci", {
         }));
     },
 
-    "runs server with specified port": function (done) {
+    "// runs server with specified port": function (done) {
 
         this.config.server.port = 2222;
 
@@ -635,5 +637,14 @@ buster.testCase("buster-ci", {
                 refute.called(th.fs.createWriteStream);
                 assert.calledWith(th.testCli.create, process.stdout);
             }.bind(this)));
-        }
+        },
+
+    "kills server when done": function(done){
+        var killServerSpy = this.spy(BusterCi.prototype, 'killServer');
+        var busterCi = new BusterCi(this.config);
+
+        busterCi.run([], done(function(){
+            assert.calledOnce(killServerSpy)
+        }))
+    },
 });

@@ -3,21 +3,48 @@
 var buster = require("buster"),
     async = require("async"),
     Agent = require("buster-ci-agent"),
+    childProcess = require("child_process"),
     proxyquire = require("proxyquire"),
+    EventEmitter = require('events').EventEmitter,
     AgentStub = buster.sinon.stub(),
     busterServer = {},
     busterTestCli = {},
     faye = {},
     fs = {},
+    childProcessStub = buster.sinon.stub(),
+    childProcessForkMock = new EventEmitter,
     BusterCi = proxyquire("../lib/buster-ci", {
         "buster-server-cli": busterServer,
         "buster-ci-agent": AgentStub,
         "buster-test-cli": busterTestCli,
         "faye": faye,
-        "fs": fs
+        "fs": fs,
+        "child_process": childProcessStub
     }),
     sandbox;
 
+childProcessForkMock.send = function(){};
+childProcessForkMock.message = function(){};
+childProcessForkMock.kill = function(){};
+
+function stubChildProcess() {
+    
+    sandbox.stub(childProcessForkMock, "kill");
+
+    sandbox.stub(childProcessForkMock, "send", function(msg){
+        if (msg.method == 'run') {
+            childProcessForkMock.emit('message', {
+                method: 'run',
+                error: null
+            });
+        }
+    });
+    sandbox.stub(childProcess, "fork").returns(childProcessForkMock);
+
+    childProcessStub.returns(childProcess);
+
+    return childProcess;
+}
 
 function stubServer() {
 
@@ -146,7 +173,9 @@ module.exports = {
     busterServer: busterServer,
     faye: faye,
     fs: fs,
-    
+    childProcessStub: childProcessStub,
+    childProcessForkMock: childProcessForkMock,
+
     setUp: function () {
         async.setImmediate = function (fn) {
             fn();
@@ -158,6 +187,7 @@ module.exports = {
         this.agent.listen.callsArg(0);
         this.testCli = stubTestCli.call(this);
         this.testCli.run.callsArg(1);
+        this.childProcess = stubChildProcess.call(this);
         sandbox.stub(faye, "Client");
         sandbox.stub(fs, "createWriteStream");
     },
