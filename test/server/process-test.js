@@ -5,21 +5,30 @@ var buster = require("buster"),
     proxyquire = require("proxyquire"),
     assert = buster.assert,
     refute = buster.refute,
-    match = buster.sinon.match;
+    match = buster.sinon.match,
+    sandbox = buster.sinon.sandbox.create(),
+    server,
+    processSend;
+
+server = busterServer.create(undefined, undefined, {});
+sandbox.stub(server, "run");
+sandbox.stub(busterServer, "create").returns(server);
+
+proxyquire("../../lib/server/process", {
+    "buster-server-cli": busterServer
+});
 
 buster.testCase("buster-ci server process", {
     setUp: function(){
-        var server = this.server = busterServer.create(undefined, undefined, {});
-
-        this.stub(busterServer, "create").returns(server)
-
-        proxyquire("../../lib/server/process", {
-            "buster-server-cli": busterServer
-        });
+        processSend = process.send;
     },
 
     tearDown: function(){
-        
+        if (processSend) {
+            process.send = processSend;
+        } else {
+            delete process.send;
+        }
     },
 
     "creates server": function(){
@@ -27,22 +36,31 @@ buster.testCase("buster-ci server process", {
     },
 
     "message runs server": function(done){
-        var server = this.server;
         var message = {
             method: "run",
-            args: [123]
+            args: ['-p1111']
         }
         var args = message.args.concat([match.func]);
 
-        this.stub(server, "run");
-
         process.send = done(function(){
             assert.calledOnceWith(server.run, args[0], args[1]);
-            delete process.send;
         });
 
         process.emit("message", message);
 
-        server.run.callArg(1)
+        server.run.callArg(1);
+    },
+
+    "unhandled message sends error": function(done){
+        var message = {
+            method: "abc"
+        }
+
+        process.send = done(function(msg){
+            assert.match(msg, message);
+            assert.hasPrototype(msg.error, Error.prototype);
+        });
+
+        process.emit("message", message);
     }
 })
