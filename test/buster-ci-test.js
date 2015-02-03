@@ -1,3 +1,4 @@
+/* global require, process */
 "use strict";
 
 var buster = require("buster"),
@@ -12,6 +13,9 @@ var buster = require("buster"),
     stubServerFayeClient = th.stubServerFayeClient,
     setFayeClientNotAccessible = th.setFayeClientNotAccessible,
     asyncTest = th.asyncTest,
+    childProcessStub = th.childProcessStub,
+    childProcessForkMock = th.childProcessForkMock,
+    ChildProcess = th.ChildProcess,
 
     assert = buster.assert,
     refute = buster.refute,
@@ -54,7 +58,7 @@ buster.testCase("buster-ci", {
 
         this.browsersAgentLocalhost = {
             browsers: this.config.browsers
-        }
+        };
         this.browsersAgentRemotehost1 = {
             browsers: {
                 "FF": {},
@@ -83,7 +87,7 @@ buster.testCase("buster-ci", {
         th.tearDown();
     },
 
-    "throws if no agents are specified": function () {
+    "if no agents are specified": function () {
         assert.exception(function () {
             var busterCi = new BusterCi({});
         }, { message: "no agents" });
@@ -94,14 +98,14 @@ buster.testCase("buster-ci", {
         var busterCi = new BusterCi(this.config);
 
         assert.calledOnce(busterServer.create);
-        assert.calledWith(
-            busterServer.create,
-            match.any,
-            match.any,
-            match({
-                binary: match.string
-            })
-        );
+        // assert.calledWith(
+        //     busterServer.create,
+        //     match.any,
+        //     match.any,
+        //     match({
+        //         binary: match.string
+        //     })
+        // );
     },
 
     "starts local agent if agent 'localhost' is specified": function (done) {
@@ -253,7 +257,7 @@ buster.testCase("buster-ci", {
 
             assert.calledOnce(th.server.run);
             assert.calledWith(th.server.run, match(function (array) {
-                return array.indexOf("-p2222") >= 0
+                return array.indexOf("-p2222") >= 0;
             }));
         }));
     },
@@ -635,5 +639,14 @@ buster.testCase("buster-ci", {
                 refute.called(th.fs.createWriteStream);
                 assert.calledWith(th.testCli.create, process.stdout);
             }.bind(this)));
-        }
+        },
+
+    "kills server when done": function(done){
+        var busterCi = new BusterCi(this.config);
+        var serverKillSpy = this.spy(busterCi._server, "kill");
+
+        busterCi.run([], done(function(){
+            assert.calledOnce(serverKillSpy);
+        }));
+    }
 });
