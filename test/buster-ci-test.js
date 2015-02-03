@@ -1,3 +1,4 @@
+/* global require, process */
 "use strict";
 
 var buster = require("buster"),
@@ -57,7 +58,7 @@ buster.testCase("buster-ci", {
 
         this.browsersAgentLocalhost = {
             browsers: this.config.browsers
-        }
+        };
         this.browsersAgentRemotehost1 = {
             browsers: {
                 "FF": {},
@@ -256,7 +257,7 @@ buster.testCase("buster-ci", {
 
             assert.calledOnce(th.server.run);
             assert.calledWith(th.server.run, match(function (array) {
-                return array.indexOf("-p2222") >= 0
+                return array.indexOf("-p2222") >= 0;
             }));
         }));
     },
@@ -642,10 +643,10 @@ buster.testCase("buster-ci", {
 
     "kills server when done": function(done){
         var busterCi = new BusterCi(this.config);
-        var serverKillSpy = this.spy(busterCi._server, 'kill');
+        var serverKillSpy = this.spy(busterCi._server, "kill");
 
         busterCi.run([], done(function(){
             assert.calledOnce(serverKillSpy);
-        }))
+        }));
     }
 });

@@ -1,3 +1,4 @@
+/* global require */
 "use strict";
 
 var buster = require("buster"),
@@ -9,7 +10,7 @@ var buster = require("buster"),
     }),
     assert = buster.assert,
     refute = buster.refute,
-    childProcessForkMock = new EventEmitter,
+    childProcessForkMock = new EventEmitter(),
     sandbox;
 
     childProcessForkMock.send = function(){};

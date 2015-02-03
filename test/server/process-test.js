@@ -1,3 +1,4 @@
+/* global require, process */
 "use strict";
 
 var buster = require("buster"),
@@ -38,8 +39,8 @@ buster.testCase("buster-ci server process", {
     "message runs server": function(done){
         var message = {
             method: "run",
-            args: ['-p1111']
-        }
+            args: ["-p1111"]
+        };
         var args = message.args.concat([match.func]);
 
         process.send = done(function(){
@@ -54,7 +55,7 @@ buster.testCase("buster-ci server process", {
     "unhandled message sends error": function(done){
         var message = {
             method: "abc"
-        }
+        };
 
         process.send = done(function(msg){
             assert.match(msg, message);
@@ -63,4 +64,4 @@ buster.testCase("buster-ci server process", {
 
         process.emit("message", message);
     }
-})
+});

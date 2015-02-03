@@ -1,3 +1,4 @@
+/* global global, module, require */
 "use strict";
 
 var buster = require("buster"),
@@ -5,15 +6,13 @@ var buster = require("buster"),
     Agent = require("buster-ci-agent"),
     ChildProcess = require("child_process"),
     proxyquire = require("proxyquire"),
-    EventEmitter = require('events').EventEmitter,
+    EventEmitter = require("events").EventEmitter,
     AgentStub = buster.sinon.stub(),
-    busterServer = {},
     busterTestCli = {},
     faye = {},
     fs = {},
     childProcessStub = buster.sinon.stub(),
-    childProcessForkMock = new EventEmitter,
-    path = require("path"),
+    childProcessForkMock = new EventEmitter(),
     Server = proxyquire("../lib/server", {
         "child_process": ChildProcess
     }),
@@ -36,9 +35,9 @@ function stubChildProcess() {
     sandbox.stub(childProcessForkMock, "kill");
 
     sandbox.stub(childProcessForkMock, "send", function(msg){
-        if (msg.method == 'run') {
-            childProcessForkMock.emit('message', {
-                method: 'run',
+        if (msg.method == "run") {
+            childProcessForkMock.emit("message", {
+                method: "run",
                 error: null
             });
         }
@@ -83,7 +82,7 @@ function stubFayeClient(url) {
         if (event === "transport:down" && !fayeClient.accessible) {
             cb();
         }
-    }
+    };
 
     return fayeClient;
 }
@@ -210,8 +209,8 @@ module.exports = {
         // 335b48c795d6d21a7d1a442af7837ec2e1ff7c36
         var origClearTimeout = global.clearTimeout;
         sandbox.stub(global, "clearTimeout", function (timerId) {
-            if (typeof timerId === 'object') {
-                timerId = timerId.id
+            if (typeof timerId === "object") {
+                timerId = timerId.id;
             }
             origClearTimeout(timerId);
         });
