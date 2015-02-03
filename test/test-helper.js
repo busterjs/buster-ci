@@ -3,7 +3,7 @@
 var buster = require("buster"),
     async = require("async"),
     Agent = require("buster-ci-agent"),
-    childProcess = require("child_process"),
+    ChildProcess = require("child_process"),
     proxyquire = require("proxyquire"),
     EventEmitter = require('events').EventEmitter,
     AgentStub = buster.sinon.stub(),
@@ -13,13 +13,17 @@ var buster = require("buster"),
     fs = {},
     childProcessStub = buster.sinon.stub(),
     childProcessForkMock = new EventEmitter,
+    path = require("path"),
+    Server = proxyquire("../lib/server", {
+        "child_process": ChildProcess
+    }),
     BusterCi = proxyquire("../lib/buster-ci", {
-        "buster-server-cli": busterServer,
+        "./server": Server,
         "buster-ci-agent": AgentStub,
         "buster-test-cli": busterTestCli,
         "faye": faye,
         "fs": fs,
-        "child_process": childProcessStub
+        "child_process": ChildProcess
     }),
     sandbox;
 
@@ -39,18 +43,16 @@ function stubChildProcess() {
             });
         }
     });
-    sandbox.stub(childProcess, "fork").returns(childProcessForkMock);
 
-    childProcessStub.returns(childProcess);
+    sandbox.stub(ChildProcess, "fork").returns(childProcessForkMock);
 
-    return childProcess;
+    return ChildProcess;
 }
 
 function stubServer() {
-
-    var server = busterServer.create(undefined, undefined, {});
+    var server = Server.create();
     sandbox.stub(server, "run");
-    sandbox.stub(busterServer, "create").returns(server);
+    sandbox.stub(Server, "create").returns(server);
     
     return server;
 }
@@ -170,29 +172,31 @@ module.exports = {
     
     AgentStub: AgentStub,
     BusterCi: BusterCi,
-    busterServer: busterServer,
+    busterServer: Server,
     faye: faye,
     fs: fs,
     childProcessStub: childProcessStub,
     childProcessForkMock: childProcessForkMock,
+    ChildProcess: ChildProcess,
 
     setUp: function () {
         async.setImmediate = function (fn) {
             fn();
         };
         sandbox = buster.sinon.sandbox.create();
+        this.ChildProcess = stubChildProcess.call(this);
         this.server = stubServer.call(this);
         this.server.run.callsArg(1);
         this.agent = stubAgent.call(this);
         this.agent.listen.callsArg(0);
         this.testCli = stubTestCli.call(this);
         this.testCli.run.callsArg(1);
-        this.childProcess = stubChildProcess.call(this);
         sandbox.stub(faye, "Client");
         sandbox.stub(fs, "createWriteStream");
     },
     
     tearDown: function () {
+        this.server.kill();
         AgentStub.reset();
         sandbox.restore();
     },
