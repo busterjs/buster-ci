@@ -26,7 +26,7 @@ buster.testCase("buster-ci", {
 
             server: {
                 host: "ci-host",
-                port: 2222
+                port: 1111
             },
 
             browsers: {
@@ -83,11 +83,23 @@ buster.testCase("buster-ci", {
         th.tearDown();
     },
 
-    "throws if no agents are specified": function () {
-        assert.exception(function () {
-            var busterCi = new BusterCi({});
-        }, { message: "no agents" });
-    },
+    "throws if no agents are specified and no phantom is configured":
+        function () {
+            assert.exception(function () {
+                var busterCi = new BusterCi({});
+            }, { message: "specify" });
+        },
+
+    "doesn't throw if no agents are specified but phantom is configured":
+        function () {
+            refute.exception(function () {
+                var busterCi = new BusterCi({
+                    server: {
+                        runPhantom: true
+                    }
+                });
+            });
+        },
 
     "creates server": function () {
 
@@ -122,8 +134,8 @@ buster.testCase("buster-ci", {
         function (done) {
 
             delete this.config.agents.localhost;
-            this.fayeClientServer = stubServerFayeClient(
-                "http://localhost:2222/messaging",  [1, 2]);
+            this.fayeClientDefault = stubServerFayeClient(
+                "http://localhost:1111/messaging",  [1, 2]);
 
             new BusterCi(this.config).run([], done(function () {
 
@@ -165,7 +177,7 @@ buster.testCase("buster-ci", {
         var busterCi = new BusterCi(this.config);
         this.stub(busterCi._logger, "error");
         busterCi.run([], done(function () {
-
+            assert.calledOnce(th.agent.close);
             assert(th.agent.close.calledBefore(testCliExit));
         }));
     },
@@ -173,8 +185,8 @@ buster.testCase("buster-ci", {
     "doesn't try do stop localAgent if not created": function (done) {
 
         delete this.config.agents.localhost;
-        this.fayeClientServer = stubServerFayeClient(
-            "http://localhost:2222/messaging",  [1, 2]);
+        this.fayeClientDefault = stubServerFayeClient(
+            "http://localhost:1111/messaging",  [1, 2]);
         this.fayeClientRemotehost1.accessible = false;
 
         new BusterCi(this.config).run([], done(function () {
@@ -201,13 +213,13 @@ buster.testCase("buster-ci", {
         function (done) {
 
             delete this.config.agents.localhost;
-            this.fayeClientServer = stubServerFayeClient(
-                "http://localhost:2222/messaging",  [1, 2]);
+            this.fayeClientDefault = stubServerFayeClient(
+                "http://localhost:1111/messaging",  [1, 2]);
 
             new BusterCi(this.config).run([], done(function () {
 
                 assert.calledWith(faye.Client,
-                    "http://localhost:2222/messaging");
+                    "http://localhost:1111/messaging");
             }));
         },
 
@@ -240,8 +252,7 @@ buster.testCase("buster-ci", {
 
         new BusterCi(this.config).run([], done(function () {
 
-            assert.calledOnce(th.server.run);
-            assert.calledWith(th.server.run, match.array);
+            assert.calledOnce(th.server.createServer);
         }));
     },
 
@@ -250,11 +261,17 @@ buster.testCase("buster-ci", {
         this.config.server.port = 2222;
 
         new BusterCi(this.config).run([], done(function () {
+            assert.calledOnceWith(th.server.createServer, 2222);
+        }));
+    },
 
-            assert.calledOnce(th.server.run);
-            assert.calledWith(th.server.run, match(function (array) {
-                return array.indexOf("-p2222") >= 0
-            }));
+    "captures headless browser if configured": function (done) {
+
+        this.config.server.runPhantom = true;
+        this.fayeClientDefault.slaveReadyMessages.unshift({ slaveId: 0 });
+
+        new BusterCi(this.config).run([], done(function () {
+            assert.calledOnceWith(th.server.captureHeadlessBrowser, "http://localhost:1111", "0");
         }));
     },
 
@@ -347,7 +364,7 @@ buster.testCase("buster-ci", {
                             Chrome: { id: 1 },
                             IE: { id: 2 }
                         },
-                        url: "http://ci-host:2222/capture"
+                        url: "http://ci-host:1111/capture"
                     }
                 );
                 assert.calledWith(
@@ -358,7 +375,7 @@ buster.testCase("buster-ci", {
                         browsers: {
                             FF: { id: 3 }
                         },
-                        url: "http://ci-host:2222/capture"
+                        url: "http://ci-host:1111/capture"
                     }
                 );
                 assert.calledWith(
@@ -369,7 +386,7 @@ buster.testCase("buster-ci", {
                         browsers: {
                             Opera: { id: 4 }
                         },
-                        url: "http://ci-host:2222/capture"
+                        url: "http://ci-host:1111/capture"
                     }
                 );
             }.bind(this)));
@@ -424,7 +441,7 @@ buster.testCase("buster-ci", {
 
         delete this.fayeClientServer.slaveReadyMessages;
 
-        this.fayeClientServer.slaveReadyMessageHandlerRegistrationListener =
+        this.fayeClientDefault.slaveReadyMessageHandlerRegistrationListener =
             function (channel, cb) {
                 refute.called(th.testCli.run);
                 cb(this.fayeClientServer.slaveIds[0]);
@@ -443,7 +460,7 @@ buster.testCase("buster-ci", {
     "errors if not all slaves get ready after 30s": function () {
         this.clock = this.useFakeTimers();
         th.fixSinon();
-        this.fayeClientServer.slaveReadyMessages.splice(2, 2);
+        this.fayeClientDefault.slaveReadyMessages.splice(2, 2);
         var testCliExit = th.testCli.exit;
 
         var busterCi = new BusterCi(this.config);
@@ -462,7 +479,7 @@ buster.testCase("buster-ci", {
     "errors if not all slaves get ready after configured timeout": function () {
         this.clock = this.useFakeTimers();
         th.fixSinon();
-        this.fayeClientServer.slaveReadyMessages.splice(2, 2);
+        this.fayeClientDefault.slaveReadyMessages.splice(2, 2);
         var testCliExit = th.testCli.exit;
         this.config.captureTimeout = 40;
 
@@ -479,8 +496,9 @@ buster.testCase("buster-ci", {
             "Not all browsers got ready!: 3,4");
     },
 
-    "uses port of server configuration for test run": function (done) {
+   "uses port of server configuration for test run": function (done) {
 
+        this.config.server.port = 2222;
         var serverCfg = ["--server", "http://localhost:2222"];
 
         new BusterCi(this.config).run([], done(function () {
@@ -545,7 +563,7 @@ buster.testCase("buster-ci", {
         delete this.fayeClientServer.slaveDeathMessages;
         var testCliExit = th.testCli.exit;
 
-        this.fayeClientServer.slaveDeathMessageHandlerRegistrationListener =
+        this.fayeClientDefault.slaveDeathMessageHandlerRegistrationListener =
             done(function (channel, cb) {
                 refute.called(testCliExit);
                 cb(this.fayeClientServer.slaveIds[0]);
@@ -564,7 +582,7 @@ buster.testCase("buster-ci", {
     "errors if not all browsers are closed after 30s": function () {
         this.clock = this.useFakeTimers();
         th.fixSinon();
-        this.fayeClientServer.slaveDeathMessages.splice(2, 2);
+        this.fayeClientDefault.slaveDeathMessages.splice(2, 2);
         var testCliExit = th.testCli.exit;
 
         var busterCi = new BusterCi(this.config);
@@ -584,7 +602,7 @@ buster.testCase("buster-ci", {
         function () {
             this.clock = this.useFakeTimers();
             th.fixSinon();
-            this.fayeClientServer.slaveDeathMessages.splice(2, 2);
+            this.fayeClientDefault.slaveDeathMessages.splice(2, 2);
             var testCliExit = th.testCli.exit;
             this.config.closeTimeout = 40;
 
@@ -601,9 +619,22 @@ buster.testCase("buster-ci", {
                 "Not all browsers could be closed!: 3,4");
         },
 
+    "exits immediately if no browsers have to be closed": function (done) {
+
+        delete this.config.agents;
+        this.config.server.runPhantom = true;
+        this.fayeClientDefault.slaveReadyMessages = [ { slaveId: 0 } ];
+        delete this.fayeClientServer.slaveDeathMessages;
+        var testCliExit = th.testCli.exit;
+
+        new BusterCi(this.config).run([], done(function () {
+            assert.calledOnce(testCliExit);
+        }));
+    },
+
     "can handle gracefully disconnect": function (done) {
         this.fayeClientServer.slaveDeathMessages.splice(3, 1);
-        this.fayeClientServer.slaveDisconnectMessages = [4];
+        this.fayeClientServer.slaveDisconnectMessages = [ { slaveId: 4 } ];
         var testCliExit = th.testCli.exit;
 
         var busterCi = new BusterCi(this.config);

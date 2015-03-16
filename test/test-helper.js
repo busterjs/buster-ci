@@ -22,9 +22,10 @@ var buster = require("buster"),
 function stubServer() {
 
     var server = busterServer.create(undefined, undefined, {});
-    sandbox.stub(server, "run");
+    sandbox.stub(server, "createServer");
+    sandbox.stub(server, "captureHeadlessBrowser");
     sandbox.stub(busterServer, "create").returns(server);
-    
+
     return server;
 }
 
@@ -35,13 +36,13 @@ function stubAgent(config) {
     sandbox.stub(agent, "listen");
     sandbox.stub(agent, "close");
     AgentStub.returns(agent);
-    
+
     return agent;
 }
 
-    
+
 function stubFayeClient(url) {
-    
+
     var emptyFunc = function () {};
     var fayeClient = { accessible: true };
     fayeClient.publish = emptyFunc;
@@ -60,9 +61,9 @@ function stubFayeClient(url) {
 }
 
 function stubAgentFayeClient(url, answer) {
-    
+
     var fayeClient = stubFayeClient(url);
-    
+
     function welcomeBack(channel, cb) {
         if (answer.browsers) {
             setTimeout(cb.bind(null, answer), 0);
@@ -74,23 +75,23 @@ function stubAgentFayeClient(url, answer) {
 
     fayeClient.subscribe = welcomeBack;
     sandbox.spy(fayeClient, "subscribe");
-    
+
     return fayeClient;
 }
- 
+
 function stubServerFayeClient(url, slaveIds) {
-    
+
     var fayeClient = stubFayeClient(url);
-    
+
     var stub = {};
     stub.slaveIds = slaveIds.map(function (slaveId) {
         return { slaveId: slaveId };
     });
     stub.slaveReadyMessages = stub.slaveIds.slice(0);
     stub.slaveDeathMessages = stub.slaveIds.slice(0);
-    
+
     fayeClient.subscribe = function (channel, cb) {
-        
+
         setTimeout(function () {
             if (channel === "/slave_ready") {
                 if (stub.slaveReadyMessageHandlerRegistrationListener) {
@@ -101,7 +102,7 @@ function stubServerFayeClient(url, slaveIds) {
                     stub.slaveReadyMessages.forEach(cb);
                 }
             }
-            
+
             if (channel === "/slave_death") {
                 if (stub.slaveDeathMessageHandlerRegistrationListener) {
                     stub.slaveDeathMessageHandlerRegistrationListener(
@@ -122,7 +123,7 @@ function stubServerFayeClient(url, slaveIds) {
             then: function (cb) { cb(); }
         };
     };
-    
+
     return stub;
 }
 
@@ -134,26 +135,26 @@ function stubTestCli() {
         callback(exitCode);
     });
     sandbox.stub(busterTestCli, "create").returns(testCli);
-    
+
     return testCli;
 }
 
-
+process.setMaxListeners(0);
 module.exports = {
-    
+
     AgentStub: AgentStub,
     BusterCi: BusterCi,
     busterServer: busterServer,
     faye: faye,
     fs: fs,
-    
+
     setUp: function () {
         async.setImmediate = function (fn) {
             fn();
         };
         sandbox = buster.sinon.sandbox.create();
         this.server = stubServer.call(this);
-        this.server.run.callsArg(1);
+        this.server.createServer.callsArg(2);
         this.agent = stubAgent.call(this);
         this.agent.listen.callsArg(0);
         this.testCli = stubTestCli.call(this);
@@ -161,15 +162,15 @@ module.exports = {
         sandbox.stub(faye, "Client");
         sandbox.stub(fs, "createWriteStream");
     },
-    
+
     tearDown: function () {
         AgentStub.reset();
         sandbox.restore();
     },
-    
+
     stubAgentFayeClient: stubAgentFayeClient,
     stubServerFayeClient: stubServerFayeClient,
-    
+
     fixSinon: function () {
         // FIX for sinon.js bug:
         // https://github.com/cjohansen/Sinon.JS/commit/
