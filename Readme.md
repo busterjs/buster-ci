@@ -23,6 +23,10 @@ to see how **buster-ci** is used.
 
 ## Changelog
 
+**0.2.2** (16.03.2015)
+
+* [Capture headless browser](https://github.com/busterjs/buster-ci/commit/31501ee)
+
 **0.2.1** (30.01.2015)
 
 * Fix for issue [#448 - buster-ci should pass the server url to buster test cli](https://github.com/busterjs/buster/issues/448)
