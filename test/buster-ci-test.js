@@ -169,6 +169,42 @@ buster.testCase("buster-ci", {
             }));
         },
 
+    "warns if not all agents are accessible and errorOnDownAgent=false":
+        function (done) {
+
+            this.fayeClientRemotehost1.accessible = false;
+            var testCliExit = th.testCli.exit;
+            this.config.errorOnDownAgent = false;
+
+            var busterCi = new BusterCi(this.config);
+            this.stub(busterCi._logger, "warn");
+            busterCi.run([], done(function () {
+
+                assert.calledWith(busterCi._logger.warn,
+                "Agent http://remotehost1:8888 not accessible!");
+                assert.calledWith(testCliExit, 1);
+            }));
+        },
+
+    "doesn't try to welcome not accessible agents if errorOnDownAgent=false":
+        function (done) {
+
+            this.fayeClientRemotehost1.accessible = false;
+            var testCliExit = th.testCli.exit;
+            this.config.errorOnDownAgent = false;
+
+            var busterCi = new BusterCi(this.config);
+            this.stub(busterCi._logger, "warn");
+            busterCi.run([], done(function () {
+
+                refute.calledWith(
+                    this.fayeClientRemotehost1.publish,
+                    "/messages",
+                    { command: "Welcome" }
+                );
+            }).bind(this));
+        },
+
     "stops localAgent before calling exit": function (done) {
 
         this.fayeClientRemotehost1.accessible = false;
@@ -271,7 +307,8 @@ buster.testCase("buster-ci", {
         this.fayeClientDefault.slaveReadyMessages.unshift({ slaveId: 0 });
 
         new BusterCi(this.config).run([], done(function () {
-            assert.calledOnceWith(th.server.captureHeadlessBrowser, "http://localhost:1111", "0");
+            assert.calledOnceWith(th.server.captureHeadlessBrowser,
+                "http://localhost:1111", "0");
         }));
     },
 
@@ -496,7 +533,7 @@ buster.testCase("buster-ci", {
             "Not all browsers got ready!: 3,4");
     },
 
-   "uses port of server configuration for test run": function (done) {
+    "uses port of server configuration for test run": function (done) {
 
         this.config.server.port = 2222;
         var serverCfg = ["--server", "http://localhost:2222"];
