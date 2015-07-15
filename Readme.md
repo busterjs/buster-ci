@@ -23,9 +23,13 @@ to see how **buster-ci** is used.
 
 ## Changelog
 
+**0.2.3** (15.07.2015)
+
+* [Config option `errorOnDownAgent` added](http://docs.busterjs.org/en/latest/modules/buster-ci/#errorondownagent)
+
 **0.2.2** (16.03.2015)
 
-* [Capture headless browser](https://github.com/busterjs/buster-ci/commit/31501ee)
+* [Capture headless browser](http://docs.busterjs.org/en/latest/modules/buster-ci/#capturing-headless-browser)
 
 **0.2.1** (30.01.2015)
 
