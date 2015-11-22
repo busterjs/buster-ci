@@ -5,10 +5,7 @@
   "bugs": {
     "url": "https://github.com/busterjs/buster/issues"
   },
-  "license": {
-    "type": "MIT",
-    "url": "https://github.com/busterjs/buster-ci/blob/master/LICENSE"
-   },
+  "license": "MIT",
   "author": {
     "name": "Daniel Wittner",
     "email": "Daniel.Wittner@ppi.de"
@@ -22,18 +19,18 @@
     "test": "buster-test"
   },
   "dependencies": {
-    "buster-ci-agent": "~0.1",
-    "buster-server-cli": "~0.3",
-    "buster-test-cli": "~0.8",
-    "buster-syntax": "~0.4",
-    "async": "~0.9",
-    "when": "~3.5",
-    "faye": "~1.0",
-    "formatio": "~1.1",
-    "stream-logger": "~1.0"
+    "buster-ci-agent": "https://github.com/busterjs/buster-ci-agent.git#update-deps",
+    "buster-server-cli": "https://github.com/busterjs/buster-server-cli.git#update-deps",
+    "buster-test-cli": "https://github.com/busterjs/buster-test-cli.git#update-deps",
+    "buster-syntax": "0.4.x",
+    "async": "1.x",
+    "when": "3.x",
+    "faye": "1.x",
+    "formatio": "1.x",
+    "stream-logger": "1.x"
   },
   "devDependencies": {
-    "buster": "*",
-    "proxyquire": "*"
+    "buster": "0.7.x",
+    "proxyquire": "1.x"
   }
 }
