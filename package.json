@@ -19,9 +19,9 @@
     "test": "buster-test"
   },
   "dependencies": {
-    "buster-ci-agent": "https://github.com/busterjs/buster-ci-agent.git#update-deps",
+    "buster-ci-agent": "git://github.com/busterjs/buster-ci-agent.git#update-deps",
     "buster-server-cli": "0.4.x",
-    "buster-test-cli": "https://github.com/busterjs/buster-test-cli.git#update-deps",
+    "buster-test-cli": "git://github.com/busterjs/buster-test-cli.git#update-deps",
     "buster-syntax": "0.5.x",
     "async": "1.x",
     "when": "3.x",
