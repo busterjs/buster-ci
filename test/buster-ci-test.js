@@ -22,6 +22,8 @@ buster.testCase("buster-ci", {
 
     setUp: function () {
 
+        this.timeout = 1000;
+
         this.config = {
 
             server: {
