@@ -18,6 +18,9 @@
   "scripts": {
     "test": "buster-test"
   },
+  "engines": {
+    "node": ">= 4"
+  },
   "dependencies": {
     "buster-ci-agent": "0.2.x",
     "buster-server-cli": "0.4.x",
