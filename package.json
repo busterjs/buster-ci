@@ -19,7 +19,7 @@
     "test": "buster-test"
   },
   "dependencies": {
-    "buster-ci-agent": "git://github.com/busterjs/buster-ci-agent.git#update-deps",
+    "buster-ci-agent": "0.2.x",
     "buster-server-cli": "0.4.x",
     "buster-test-cli": "0.9.x",
     "buster-syntax": "0.5.x",
